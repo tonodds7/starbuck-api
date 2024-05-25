@@ -3,10 +3,11 @@ package main
 import (
 	"backend/internal/config"
 	"backend/internal/db"
+	"backend/routes"
 	"log"
+	"net/http"
 
-	"backend/pkg/tonTest"
-
+	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 )
 
@@ -22,10 +23,21 @@ func main() {
 	db.InitDB(cfg)
 	defer db.DB.Close()
 
-	tonTest := tonTest.NewTonTestService(db.DB)
-	tonTest.DoSomething()
+	// Create a new Gorilla Mux router instance
+	router := mux.NewRouter()
 
-	// userdata.UserDatasController()
+	// Register routes related to user data
+	routes.RegisterRouteUserDate(router)
+
+	// Set up a server using the Gorilla Mux router
+	server := &http.Server{
+		Addr:    ":8080", // Change port number if needed
+		Handler: router,
+	}
+
+	// Start the server
+	log.Println("Server listening on port 8080...")
+	log.Fatal(server.ListenAndServe())
 
 	var now string
 	err = db.DB.QueryRow("SELECT NOW()").Scan(&now)

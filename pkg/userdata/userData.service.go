@@ -3,12 +3,13 @@ package userdata
 import "fmt"
 
 type IUserData interface {
+	RegisterUser() error
 }
 
 type userDataService struct {
 }
 
-func NewUseData() IUserData {
+func NewUserData() IUserData {
 	return &userDataService{}
 }
 

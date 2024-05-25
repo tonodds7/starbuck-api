@@ -1,30 +1,19 @@
 package routes
 
 import (
-	"backend/pkg/userdata"
+	"backend/handler"
+	"net/http"
 
-	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
+	"github.com/gorilla/mux"
 )
 
-type AppRouter struct {
-	router *gin.Engine
-}
+func RegisterRouteUserDate(router *mux.Router) {
+	userDataHandler := handler.NewUseDataHandler()
 
-func Router(db *gorm.DB) AppRouter {
-	router := AppRouter{router: gin.Default()}
+	groupUserData := router.PathPrefix("/userdatas").Subrouter()
 
-	// main := router.router.Group("/")
-	api := router.router.Group("/api")
+	groupUserData.HandleFunc("/{id}", func(w http.ResponseWriter, r *http.Request) {
+		userDataHandler.UserDatasController(r)
+	}).Methods("GET")
 
-	// users.AddUserController(api)
-	// authentication.AddAuthController(api, db)
-	// credential.CredentialHandler(api, db)
-	userdata.UserDatasController(api, db)
-
-	return router
-}
-
-func (router AppRouter) Run(addr ...string) error {
-	return router.router.Run()
 }
