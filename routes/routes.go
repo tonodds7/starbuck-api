@@ -7,13 +7,13 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func RegisterRouteUserDate(router *mux.Router) {
-	userDataHandler := handler.NewUseDataHandler()
+func RegisterRouteItemData(router *mux.Router) {
+	itemDataHandler := handler.NewItemDataHandler()
 
-	groupUserData := router.PathPrefix("/userdatas").Subrouter()
+	groupItemData := router.PathPrefix("/itemdatas").Subrouter()
 
-	groupUserData.HandleFunc("/{id}", func(w http.ResponseWriter, r *http.Request) {
-		userDataHandler.UserDatasController(r)
+	groupItemData.HandleFunc("/{id}", func(w http.ResponseWriter, r *http.Request) {
+		itemDataHandler.ItemDatasController(r)
 	}).Methods("GET")
 
 }

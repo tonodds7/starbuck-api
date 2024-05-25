@@ -27,7 +27,7 @@ func main() {
 	router := mux.NewRouter()
 
 	// Register routes related to user data
-	routes.RegisterRouteUserDate(router)
+	routes.RegisterRouteItemData(router)
 
 	// Set up a server using the Gorilla Mux router
 	server := &http.Server{
