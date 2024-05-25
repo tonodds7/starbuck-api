@@ -1,25 +1,33 @@
 package main
 
+import (
+	"backend/internal/config"
+	"backend/internal/db"
+	"log"
+
+	"github.com/joho/godotenv"
+)
+
 func main() {
-	// // Load environment variables from .env file
-	// err := godotenv.Load()
-	// if err != nil {
-	//     log.Fatalf("Error loading .env file: %v", err)
-	// }
+	// Load environment variables from .env file
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
 
-	// cfg := config.LoadConfig()
+	cfg := config.LoadConfig()
 
-	// db.InitDB(cfg)
-	// defer db.DB.Close()
+	db.InitDB(cfg)
+	defer db.DB.Close()
 
-	// hello.SayHello()
+	// tonTestService := tonTestService.NewTonTestService(db.DB)
 
-	// // Example query to test the connection
-	// var now string
-	// err = db.DB.QueryRow("SELECT NOW()").Scan(&now)
-	// if err != nil {
-	//     log.Fatalf("Error executing query: %v\n", err)
-	// }
+	// Example query to test the connection
+	var now string
+	err = db.DB.QueryRow("SELECT NOW()").Scan(&now)
+	if err != nil {
+		log.Fatalf("Error executing query: %v\n", err)
+	}
 
-	// log.Printf("Current time from the database: %s\n", now)
+	log.Printf("Current time from the database: %s\n", now)
 }
