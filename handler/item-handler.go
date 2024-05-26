@@ -2,6 +2,7 @@ package handler
 
 import (
 	"backend/pkg/itemdata"
+	"encoding/json"
 	"net/http"
 )
 
@@ -17,7 +18,16 @@ func NewItemDataHandler() *ItemDataHandler {
 	}
 }
 
-func (handler *ItemDataHandler) ItemDatasController(req *http.Request) {
-	handler.ItemDataService.RegisterItem()
+func (handler *ItemDataHandler) GetAllItem(w http.ResponseWriter, req *http.Request) {
+	item, err := handler.ItemDataService.GetAllItemItem()
+	if err != nil {
+		http.Error(w, "Failed to get items", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(item); err != nil {
+		http.Error(w, "Failed to encode items to JSON", http.StatusInternalServerError)
+	}
 
 }
