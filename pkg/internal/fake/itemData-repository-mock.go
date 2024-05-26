@@ -1,6 +1,10 @@
 package fake
 
-import "github.com/stretchr/testify/mock"
+import (
+	"backend/models"
+
+	"github.com/stretchr/testify/mock"
+)
 
 type MockItemDataRepository struct {
 	mock.Mock
@@ -8,7 +12,5 @@ type MockItemDataRepository struct {
 
 func (mock *MockItemDataRepository) GetAllItemItem() ([]models.Item, error) {
 	result := mock.Called()
-
-	return result.Get(0).([]Item), result.Error(1)
-
+	return result.Get(0).([]models.Item), result.Error(1)
 }

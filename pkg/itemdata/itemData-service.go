@@ -1,7 +1,9 @@
 package itemdata
 
+import "backend/models"
+
 type IItemData interface {
-	GetAllItemItem() ([]Item, error)
+	GetAllItemItem() ([]models.Item, error)
 }
 
 type itemDataService struct {
@@ -14,10 +16,10 @@ func NewItemData() IItemData {
 	}
 }
 
-func (service *itemDataService) GetAllItemItem() ([]Item, error) {
+func (service *itemDataService) GetAllItemItem() ([]models.Item, error) {
 	data, err := service.itemDataRepository.GetAllItem()
 	if err != nil {
-		return []Item{}, err
+		return []models.Item{}, err
 	}
 
 	return data, nil
