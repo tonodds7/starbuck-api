@@ -57,14 +57,12 @@ func (handler *ItemDataHandler) GetItemDetailById(w http.ResponseWriter, req *ht
 
 func (handler *ItemDataHandler) OrderItem(w http.ResponseWriter, req *http.Request) {
 
-	// Read the request body
 	var bodyBytes []byte
 	if req.Body != nil {
 		defer req.Body.Close()
 		bodyBytes, _ = io.ReadAll(req.Body)
 	}
 
-	// Decode the request body into your struct
 	var requestBody models.RequestOrder
 
 	err := json.Unmarshal(bodyBytes, &requestBody)

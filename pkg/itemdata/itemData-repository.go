@@ -24,7 +24,6 @@ func NewItemDataRepository() IItemDataRepository {
 }
 
 func (repo *itemDataRepository) GetAllItem() ([]models.Item, error) {
-	// Connect to MySQL database
 	config := config.LoadConfig()
 
 	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", config.DBUser, config.DBPassword, config.DBHost, config.DBPort, config.DBName))
@@ -34,7 +33,6 @@ func (repo *itemDataRepository) GetAllItem() ([]models.Item, error) {
 	}
 	defer db.Close()
 
-	//query
 	query := "SELECT id,name,price,quantity FROM items"
 
 	var item []models.Item
@@ -46,15 +44,12 @@ func (repo *itemDataRepository) GetAllItem() ([]models.Item, error) {
 	}
 	defer rows.Close()
 
-	//loop row and append for return
 	for rows.Next() {
 		var itemRow models.Item
-		// Scan the columns into the struct fields
 		if err := rows.Scan(&itemRow.ID, &itemRow.Name, &itemRow.Price, &itemRow.Quantity); err != nil {
 			fmt.Println("Scaner", err)
 			return nil, err
 		}
-		// Append the item to the slice
 		item = append(item, itemRow)
 	}
 
@@ -62,7 +57,6 @@ func (repo *itemDataRepository) GetAllItem() ([]models.Item, error) {
 }
 
 func (repo *itemDataRepository) GetItemDetailById(id int) (models.ItemDetail, error) {
-	// Connect to MySQL database
 	config := config.LoadConfig()
 
 	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", config.DBUser, config.DBPassword, config.DBHost, config.DBPort, config.DBName))
@@ -70,74 +64,43 @@ func (repo *itemDataRepository) GetItemDetailById(id int) (models.ItemDetail, er
 		return models.ItemDetail{}, err
 	}
 	defer db.Close()
+	query := `
+        SELECT 
+            itm.id, itm.name, itm.price, 
+            id.description, id.acidity, id.body, id.processing_method, id.tasting_notes, id.complementary_flavors, id.region,
+            ctg.name AS category
+        FROM 
+            items itm
+        JOIN 
+            items_detail id ON itm.detail_id = id.detail_id
+        JOIN 
+            categories ctg ON itm.category_id = ctg.category_id
+        WHERE 
+            itm.id = ?
+    `
 
-	//query itemId
-	query := fmt.Sprintf("SELECT id,name,price,detail_id,category_id FROM items WHERE id = %d ", id)
+	row := db.QueryRow(query, id)
 
-	rows, err := db.Query(query)
-	if err != nil {
-		fmt.Println("0", err)
-
-		return models.ItemDetail{}, err
-	}
-	defer rows.Close()
-
-	//loop row and append for return
 	var itemRow models.ItemDetail
-
-	var ItemDetailId int
-	var CategoryId int
-	for rows.Next() {
-		// Scan the columns into the struct fields
-		if err := rows.Scan(&itemRow.ID, &itemRow.Name, &itemRow.Price, &ItemDetailId, &CategoryId); err != nil {
-			return models.ItemDetail{}, err
-		}
-	}
-
-	//query itemdetail
-	query = fmt.Sprintf("SELECT description,acidity,body,processing_method,tasting_notes,complementary_flavors,region FROM items_detail WHERE detail_id = %d ", ItemDetailId)
-
-	rows, err = db.Query(query)
+	err = row.Scan(
+		&itemRow.ID, &itemRow.Name, &itemRow.Price,
+		&itemRow.Detail, &itemRow.Acidity, &itemRow.Body, &itemRow.Processing_Method, &itemRow.Tasting_Notes, &itemRow.Complementary_Flavors, &itemRow.Region,
+		&itemRow.Category,
+	)
 	if err != nil {
 		return models.ItemDetail{}, err
 	}
-	defer rows.Close()
 
-	for rows.Next() {
-		// Scan the columns into the struct fields
-		if err := rows.Scan(&itemRow.Detail, &itemRow.Acidity, &itemRow.Body, &itemRow.Processing_Method, &itemRow.Tasting_Notes, &itemRow.Complementary_Flavors, &itemRow.Region); err != nil {
-			return models.ItemDetail{}, err
-		}
-	}
-
-	//query itemcategories
-	query = fmt.Sprintf("SELECT name FROM categories WHERE category_id = %d ", CategoryId)
-	rows, err = db.Query(query)
-	if err != nil {
-		return models.ItemDetail{}, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		// Scan the columns into the struct fields
-		if err := rows.Scan(&itemRow.Category); err != nil {
-			return models.ItemDetail{}, err
-		}
-	}
 	return itemRow, nil
-
 }
 
 func (repo *itemDataRepository) GetQuantityItemById(id int) (int, int, error) {
-	// Connect to MySQL database
 	config := config.LoadConfig()
 	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", config.DBUser, config.DBPassword, config.DBHost, config.DBPort, config.DBName))
 	if err != nil {
 		return 0, 0, err
 	}
 	defer db.Close()
-
-	//query
 	query := fmt.Sprintf("SELECT quantity,price FROM items WHERE id = %d", id)
 
 	var item models.Item
@@ -148,14 +111,12 @@ func (repo *itemDataRepository) GetQuantityItemById(id int) (int, int, error) {
 	}
 	defer rows.Close()
 
-	//loop row and append for return
 	for rows.Next() {
 		var itemRow models.Item
-		// Scan the columns into the struct fields
+
 		if err := rows.Scan(&itemRow.Quantity, &itemRow.Price); err != nil {
 			return 0, 0, err
 		}
-		// Append the item to the slice
 		item = itemRow
 	}
 
@@ -163,8 +124,6 @@ func (repo *itemDataRepository) GetQuantityItemById(id int) (int, int, error) {
 }
 
 func (repo *itemDataRepository) UpdateItemQuantity(id int, orderQuantity int) (string, error) {
-
-	// Connect to MySQL database
 	config := config.LoadConfig()
 	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", config.DBUser, config.DBPassword, config.DBHost, config.DBPort, config.DBName))
 	if err != nil {

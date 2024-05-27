@@ -18,7 +18,6 @@ func RouteItemData(router *mux.Router) {
 
 	groupItemData.HandleFunc("/{id}", func(w http.ResponseWriter, r *http.Request) {
 
-		// Extract the ID from the URL path
 		vars := mux.Vars(r)
 		id := vars["id"]
 
@@ -26,14 +25,11 @@ func RouteItemData(router *mux.Router) {
 	}).Methods("GET")
 
 	groupItemData.HandleFunc("/order", func(w http.ResponseWriter, r *http.Request) {
-		// Check if the request method is POST
-		if r.Method != http.MethodPost {
+		if r.Method != http.MethodPatch {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 			return
 		}
-
-		// Handle the POST request
 		itemDataHandler.OrderItem(w, r)
-	}).Methods("POST")
+	}).Methods("PATCH")
 
 }
